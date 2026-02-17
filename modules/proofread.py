@@ -1,6 +1,6 @@
 from .utils import get_gemini_response
 
-def process(text):
+def process(text, model_name="gemini-1.5-pro"):
     """
     Final proofreading step.
     """
@@ -24,4 +24,4 @@ def process(text):
     # 校正後のテキスト
     """
     
-    return get_gemini_response(prompt, temperature=0.1)
+    return get_gemini_response(prompt, temperature=0.1, model_name=model_name)

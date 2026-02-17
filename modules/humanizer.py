@@ -1,6 +1,6 @@
 from .utils import get_gemini_response
 
-def process(text, creativity=0.7):
+def process(text, creativity=0.7, model_name="gemini-1.5-pro"):
     """
     Applies humanization logic to the text.
     """
@@ -23,4 +23,4 @@ def process(text, creativity=0.7):
     # リライト後のテキスト
     """
     
-    return get_gemini_response(prompt, temperature=creativity)
+    return get_gemini_response(prompt, temperature=creativity, model_name=model_name)

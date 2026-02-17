@@ -25,6 +25,8 @@ with st.sidebar:
     
     st.divider()
     
+    model_name = st.selectbox("使用モデル", ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-3-pro-preview"], index=0)
+    
     mode = st.radio("処理モード", ["単一記事", "一括処理 (CSV/Spreadsheet)"])
     
     st.divider()
@@ -84,7 +86,7 @@ if mode == "単一記事":
             # 1. Humanize (Module 2)
             if humanize_enabled:
                 status_text.text("② ヒューマナイズ実行中...")
-                current_text = humanizer.process(current_text, creativity)
+                current_text = humanizer.process(current_text, creativity, model_name=model_name)
                 st.session_state['result_humanized'] = current_text
                 progress_bar.progress(25)
             
@@ -92,21 +94,21 @@ if mode == "単一記事":
             if seo_enabled:
                 status_text.text("③ SEO分析・リライト実行中...")
                 # Pass global CSE ID
-                current_text = seo.process(current_text, target_kw, custom_search_engine_id=google_cse_id)
+                current_text = seo.process(current_text, target_kw, custom_search_engine_id=google_cse_id, model_name=model_name)
                 st.session_state['result_seo'] = current_text
                 progress_bar.progress(50)
 
             # 3. Rules (Module 4)
             if rules_enabled:
                 status_text.text("④ 独自ルール適用中...")
-                current_text = rules.process(current_text, forbidden_words_str=forbidden_words)
+                current_text = rules.process(current_text, forbidden_words_str=forbidden_words, model_name=model_name)
                 st.session_state['result_rules'] = current_text
                 progress_bar.progress(75)
             
             # 4. Proofread (Module 1)
             if proofread_enabled:
                 status_text.text("① 文法チェック実行中...")
-                current_text = proofread.process(current_text)
+                current_text = proofread.process(current_text, model_name=model_name)
                 st.session_state['result_proofread'] = current_text
                 progress_bar.progress(100)
             
@@ -184,16 +186,16 @@ elif mode == "一括処理 (CSV/Spreadsheet)":
                         # Pipeline with simplified error handling
                         try:
                             if humanize_enable_bulk:
-                                current_text = humanizer.process(current_text) # Uses default creativity
+                                current_text = humanizer.process(current_text, model_name=model_name) 
                             
                             if seo_enable_bulk:
-                                current_text = seo.process(current_text, target_kw, custom_search_engine_id=google_cse_id)
+                                current_text = seo.process(current_text, target_kw, custom_search_engine_id=google_cse_id, model_name=model_name)
                                 
                             if rules_enable_bulk:
-                                current_text = rules.process(current_text, forbidden_words_str="コスパ最強, 絶対") # Default or link to input
+                                current_text = rules.process(current_text, forbidden_words_str="コスパ最強, 絶対", model_name=model_name) 
                                 
                             if proofread_enable_bulk:
-                                current_text = proofread.process(current_text)
+                                current_text = proofread.process(current_text, model_name=model_name)
                                 
                             results.append(current_text)
                         

@@ -29,7 +29,7 @@ def generate_diff_html(original, revised):
     html.append('</div>')
     return "".join(html)
 
-def get_gemini_response(prompt, model_name="gemini-pro", temperature=0.7):
+def get_gemini_response(prompt, model_name="gemini-1.5-pro", temperature=0.7):
     """
     Simpler wrapper for Gemini API.
     Assumes GOOGLE_API_KEY is set in environment variables.
@@ -51,4 +51,4 @@ def get_gemini_response(prompt, model_name="gemini-pro", temperature=0.7):
         )
         return response.text
     except Exception as e:
-        return f"Error generating content: {str(e)}"
+        return f"Error using model {model_name}: {str(e)}"

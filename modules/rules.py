@@ -1,7 +1,7 @@
 from .utils import get_gemini_response
 import json
 
-def process(text, rules_json_str=None, forbidden_words_str=None):
+def process(text, rules_json_str=None, forbidden_words_str=None, model_name="gemini-1.5-pro"):
     """
     Applies custom rules to the text.
     Uses LLM for complex tonal adjustments, and simple string replacement for strict rules (optional).
@@ -39,4 +39,4 @@ def process(text, rules_json_str=None, forbidden_words_str=None):
     # 修正後のテキスト
     """
     
-    return get_gemini_response(prompt, temperature=0.3)
+    return get_gemini_response(prompt, temperature=0.3, model_name=model_name)
