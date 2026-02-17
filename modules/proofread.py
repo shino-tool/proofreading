@@ -1,6 +1,6 @@
 from .utils import get_gemini_response
 
-def process(text, model_name="gemini-1.5-pro"):
+def process(text, model_name="gemini-3-pro-preview"):
     """
     Final proofreading step.
     """
@@ -18,6 +18,10 @@ def process(text, model_name="gemini-1.5-pro"):
     # 注意
     大きく文章を変える必要はありません。あくまで「校正」の範囲で修正してください。
     
+    # 禁止事項
+    * Markdown形式（**太字**、# 見出し等）は絶対に使用しないでください。
+    * 元のテキストがマークダウンを含んでいない限り、プレーンテキストで返してください。
+
     # 対象テキスト
     {text}
 

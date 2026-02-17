@@ -25,7 +25,12 @@ with st.sidebar:
     
     st.divider()
     
-    model_name = st.selectbox("使用モデル", ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-3-pro-preview"], index=0)
+    st.divider()
+    
+    # model_name = st.selectbox("使用モデル", ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-3-pro-preview"], index=0)
+    # User restriction:
+    model_name = "gemini-3-pro-preview"
+    st.caption(f"使用モデル: {model_name}")
     
     mode = st.radio("処理モード", ["単一記事", "一括処理 (CSV/Spreadsheet)"])
     
@@ -66,6 +71,7 @@ if mode == "単一記事":
         with st.expander("④ 独自ルール設定"):
             rules_enabled = st.checkbox("有効にする", value=True, key="r_enable")
             forbidden_words = st.text_area("禁止ワード (カンマ区切り)", "コスパ最強, 絶対")
+            custom_check_items = st.text_area("順守すべきチェック項目 (自由記述)", "例：文体は親しみやすく、専門用語は噛み砕く")
             
         # Step 1: Proofreading
         with st.expander("① 文法チェック設定"):
@@ -101,7 +107,7 @@ if mode == "単一記事":
             # 3. Rules (Module 4)
             if rules_enabled:
                 status_text.text("④ 独自ルール適用中...")
-                current_text = rules.process(current_text, forbidden_words_str=forbidden_words, model_name=model_name)
+                current_text = rules.process(current_text, forbidden_words_str=forbidden_words, check_items_str=custom_check_items, model_name=model_name)
                 st.session_state['result_rules'] = current_text
                 progress_bar.progress(75)
             
@@ -124,10 +130,12 @@ if mode == "単一記事":
                 st.text_area("完了テキスト", value=current_text, height=600, key="final_output")
                 
             with res_tab2:
-                from modules.utils import generate_diff_html
-                st.caption("元のパラグラフと変更後の比較（赤：削除、緑：追加）")
-                diff_html = generate_diff_html(input_text, current_text)
-                st.markdown(diff_html, unsafe_allow_html=True)
+                st.caption("左：変更前 / 右：変更後")
+                col_diff_1, col_diff_2 = st.columns(2)
+                with col_diff_1:
+                    st.text_area("Original", input_text, height=600, disabled=True)
+                with col_diff_2:
+                    st.text_area("Rewritten", current_text, height=600, disabled=True)
             
             with res_tab3:
                 if 'result_humanized' in st.session_state:
@@ -192,7 +200,7 @@ elif mode == "一括処理 (CSV/Spreadsheet)":
                                 current_text = seo.process(current_text, target_kw, custom_search_engine_id=google_cse_id, model_name=model_name)
                                 
                             if rules_enable_bulk:
-                                current_text = rules.process(current_text, forbidden_words_str="コスパ最強, 絶対", model_name=model_name) 
+                                current_text = rules.process(current_text, forbidden_words_str="コスパ最強, 絶対", check_items_str="文体は親しみやすく", model_name=model_name) 
                                 
                             if proofread_enable_bulk:
                                 current_text = proofread.process(current_text, model_name=model_name)

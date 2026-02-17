@@ -80,11 +80,16 @@ def process(text, target_keyword, custom_search_engine_id=None, model_name="gemi
 
     # 盛り込むべきキーワードリスト
     {related_keywords_str}
+    
+    # 禁止事項
+    * Markdown形式（**太字**、# 見出し等）は絶対に使用しないでください。ただのプレーンテキストで出力してください。
+    * 「記事をリライトしました」などの挨拶や前置きは一切不要です。リライト後の本文のみを出力してください。
+    * 「いかがでしたか？」などの無意味な定型文は削除してください。
 
     # 元のテキスト
     {text}
 
-    # リライト後のテキスト
+    # リライト後のテキスト（プレーンテキストのみ）
     """
     
     return get_gemini_response(prompt, temperature=0.5, model_name=model_name) # Lower temperature for SEO precision

@@ -1,7 +1,7 @@
 from .utils import get_gemini_response
 import json
 
-def process(text, rules_json_str=None, forbidden_words_str=None, model_name="gemini-1.5-pro"):
+def process(text, rules_json_str=None, forbidden_words_str=None, check_items_str=None, model_name="gemini-3-pro-preview"):
     """
     Applies custom rules to the text.
     Uses LLM for complex tonal adjustments, and simple string replacement for strict rules (optional).
@@ -16,12 +16,19 @@ def process(text, rules_json_str=None, forbidden_words_str=None, model_name="gem
     if forbidden_words_str:
         forbidden_list = [w.strip() for w in forbidden_words_str.split(",")]
         forbidden_instruction = f"""
-        以下の単語は「禁止ワード」です。絶対に使用しないでください。もし含まれている場合は、別の表現に言い換えてください。
-        禁止ワードリスト: {', '.join(forbidden_list)}
+        * **禁止ワード**: 以下の単語は絶対に使用しないでください。別の表現に言い換えてください。
+          リスト: {', '.join(forbidden_list)}
         """
     else:
         # Defaults mentioned in requirements
-        forbidden_instruction = "「コスパ最強」「絶対」などの誇張表現が含まれている場合は修正してください。"
+        forbidden_instruction = "* **禁止ワード**: 「コスパ最強」「絶対」などの誇張表現が含まれている場合は修正してください。"
+        
+    check_items_instruction = ""
+    if check_items_str:
+        check_items_instruction = f"""
+        * **遵守項目**: 以下の指示を守れているか確認し、守れていない場合は修正してください。
+          指示: {check_items_str}
+        """
 
     prompt = f"""
     あなたはWebメディアの編集長です。
@@ -30,13 +37,18 @@ def process(text, rules_json_str=None, forbidden_words_str=None, model_name="gem
     # ルール
     1. **表記ゆれ**: 「スマホ」は「スマートフォン」に、「引越」は「引っ越し」に統一してください。（もし該当語があれば）
     2. **語尾の統一**: 「〜です・〜ます」調（デスマス調）で統一してください。
-    3. **禁止ワードの排除**:
+    3. **禁止ワード・遵守項目の適用**:
     {forbidden_instruction}
+    {check_items_instruction}
+
+    # 禁止事項
+    * Markdown形式（**太字**、# 見出し等）は絶対に使用しないでください。
+    * 挨拶や「修正しました」等の報告は不要です。本文のみを出力してください。
 
     # テキスト
     {text}
 
-    # 修正後のテキスト
+    # 修正後のテキスト（プレーンテキストのみ）
     """
     
     return get_gemini_response(prompt, temperature=0.3, model_name=model_name)

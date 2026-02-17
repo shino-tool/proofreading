@@ -1,6 +1,6 @@
 from .utils import get_gemini_response
 
-def process(text, creativity=0.7, model_name="gemini-1.5-pro"):
+def process(text, creativity=0.7, model_name="gemini-3-pro-preview"):
     """
     Applies humanization logic to the text.
     """
@@ -15,12 +15,16 @@ def process(text, creativity=0.7, model_name="gemini-1.5-pro"):
     3. **断定回避の修正**: 「〜と言えるでしょう」「〜と考えられます」という曖昧な表現を、文脈が許す限り「〜だ」「〜です」と言い切る形に強めてください。
     4. **抽象語の具体化**: 「革新的な」「包括的な」などのマジックワードがあれば、より具体的な言葉や平易な表現に書き換えてください。
     5. **主観の注入**: 必要に応じて、書き手の感情や温度感が伝わる副詞（「なんと」「やっぱり」など）を自然な範囲で加えてください。
-    6. **元の意味の維持**: 文章の主張や事実は変えないでください。
+    6. **無駄な繋ぎ言葉の排除**: 文章のかさ増しにしかならない「いかがでしたか？」「〜について見ていきましょう」などの繋ぎフレーズは削除してください。
+    
+    # 禁止事項
+    * Markdown形式（**太字**、# 見出し等）は絶対に使用しないでください。ただのプレーンテキストで出力してください。
+    * 箇条書きもなるべく避け、自然な文章にしてください。
 
     # 入力テキスト
     {text}
 
-    # リライト後のテキスト
+    # リライト後のテキスト（プレーンテキストのみ）
     """
     
     return get_gemini_response(prompt, temperature=creativity, model_name=model_name)
